@@ -1,8 +1,10 @@
 SENJIDOWNLOADER — Windows 10/11 de 64 bits
 
-Extrae toda esta carpeta y abre SenjiDownloader.exe. No necesita instalar Python,
-.NET, FFmpeg, Deno ni ningún otro programa: todo viene incluido.
-Mantén la carpeta tools junto al ejecutable.
+Abre SenjiDownloader.exe. Puedes copiar únicamente ese ejecutable a otra PC.
+No necesita instalar Python, .NET, FFmpeg, Deno ni ningún otro programa.
+Los componentes vienen dentro del ejecutable y se preparan automáticamente en
+segundo plano después de mostrar la interfaz. La primera descarga puede esperar
+unos segundos mientras termina esa preparación.
 
 Pega varios enlaces, elige la calidad y pulsa Descargar (o Ctrl+Enter).
 Puedes ejecutar de 1 a 6 trabajos simultáneamente. Cada trabajo permite pausar,
@@ -27,7 +29,7 @@ Al convertir se crea un archivo distinto y se conserva siempre el original.
 Las actualizaciones de la app se descargan desde los Releases del repositorio
 público y se verifican con SHA-256. Se aplican automáticamente al quedar libre
 la cola. Los motores yt-dlp y Deno se comprueban cada 24 horas y se actualizan
-al quedar libre la cola. FFmpeg se renueva en las nuevas distribuciones completas.
+al quedar libre la cola. FFmpeg se renueva con las nuevas versiones de la app.
 
 Repositorio: https://github.com/Sengui0605/SenjiDownloader
 Versiones: https://github.com/Sengui0605/SenjiDownloader/releases

@@ -9,7 +9,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>SenjiDownloader</AssemblyName>
     <RootNamespace>SenjiDownloader</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>SenjiDownloader</Authors>
     <Product>SenjiDownloader</Product>
     <Description>Descargas y conversiones de medios en paralelo.</Description>
@@ -23,5 +23,6 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="assets\senji.ico" />
+    <EmbeddedResource Include="assets\tools.zip" LogicalName="SenjiDownloader.tools.zip" Condition="Exists('assets\tools.zip')" />
   </ItemGroup>
 </Project>

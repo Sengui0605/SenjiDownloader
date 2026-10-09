@@ -30,6 +30,18 @@ jobs:
           $process = Start-Process -FilePath ./dist/SenjiDownloader/SenjiDownloader.exe -ArgumentList '--self-test', "$env:RUNNER_TEMP/integration.json" -WindowStyle Hidden -PassThru -Wait
           Get-Content "$env:RUNNER_TEMP/integration.json"
           if ($process.ExitCode -ne 0) { throw 'Integration tests failed' }
+      - name: Verify dropdown interaction and standalone EXE
+        shell: pwsh
+        run: |
+          $process = Start-Process -FilePath ./dist/SenjiDownloader/SenjiDownloader.exe -ArgumentList '--ui-self-test', "$env:RUNNER_TEMP/ui.json" -WindowStyle Hidden -PassThru -Wait
+          Get-Content "$env:RUNNER_TEMP/ui.json"
+          if ($process.ExitCode -ne 0) { throw 'UI regression tests failed' }
+          $standalone = "$env:RUNNER_TEMP/standalone"
+          New-Item -ItemType Directory -Path $standalone | Out-Null
+          Copy-Item ./dist/SenjiDownloader/SenjiDownloader.exe $standalone
+          $process = Start-Process -FilePath "$standalone/SenjiDownloader.exe" -ArgumentList '--self-test', "$standalone/portable.json" -WindowStyle Hidden -PassThru -Wait
+          Get-Content "$standalone/portable.json"
+          if ($process.ExitCode -ne 0) { throw 'Standalone EXE verification failed' }
       - name: Publish version after successful verification
         shell: pwsh
         env:
@@ -38,4 +50,4 @@ jobs:
           $tag = "v$env:SENJI_VERSION"
           gh release view $tag *> $null
           if ($LASTEXITCODE -eq 0) { Write-Output "Version $tag already published. Increase Version to publish a new update."; exit 0 }
-          gh release create $tag ./dist/release/* --target $env:GITHUB_SHA --title "SenjiDownloader $env:SENJI_VERSION" --notes "Descargas simultáneas, conversión de medios y distribución portable para Windows x64. Extrae el ZIP completo para la primera instalación. SenjiDownloader.exe se utiliza para actualizar instalaciones existentes."
+          gh release create $tag ./dist/release/* --target $env:GITHUB_SHA --title "SenjiDownloader $env:SENJI_VERSION" --notes "Ejecutable portable completo para Windows x64. Abre SenjiDownloader.exe sin instalar dependencias. Incluye su runtime y todos los motores, preparados en segundo plano después de mostrar la interfaz. Descargas simultáneas, conversión de medios y actualizaciones automáticas."

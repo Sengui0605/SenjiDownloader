@@ -34,6 +34,7 @@ public sealed class UpdateService : IDisposable
             if (!force && !settings.AutoUpdate) return;
             SetStatus("Comprobando versiones…");
             var token = lifetime.Token;
+            await ToolBootstrap.EnsureAsync().WaitAsync(token);
             var repo = settings.ReleaseRepository.Trim();
             if (repo.Length > 0)
             {

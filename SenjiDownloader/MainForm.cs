@@ -135,6 +135,20 @@ public sealed class MainForm : Form
         if (quitting) return;
         try
         {
+            status.Text = "Preparando los componentes incluidos…";
+            await ToolBootstrap.EnsureAsync();
+            if (quitting) return;
+            if (preferences.EngineVersion is "incluido" or "" || string.IsNullOrEmpty(preferences.DenoVersion))
+            {
+                using var versions = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(AppPaths.Tools, "versions.json")));
+                preferences.EngineVersion = versions.RootElement.GetProperty("ytDlp").GetString() ?? "incluido";
+                preferences.DenoVersion = versions.RootElement.GetProperty("deno").GetString() ?? "";
+            }
+            status.Text = "Listo para descargar";
+        }
+        catch (Exception ex) { AppPaths.Log("Componentes: " + ex); status.Text = "No se pudieron preparar los componentes. Consulta el registro."; return; }
+        try
+        {
             if (!Program.NoIntegration) DesktopIntegration.SetStartup(preferences.StartWithWindows);
             if (!Program.NoIntegration && preferences.IntegratedPath != Environment.ProcessPath)
             {
@@ -267,7 +281,7 @@ public sealed class MainForm : Form
         });
         updateStatus.SetBounds(30, 544, 758, 48); panel.Controls.Add(updateStatus); updateStatus.Text = updater.Status;
         AddLabel(panel, "SESIÓN DEL NAVEGADOR (OPCIONAL)", 30, 621, 420);
-        var cookies = new DarkCombo("Ninguno", "Chrome", "Edge", "Firefox"); cookies.SelectedItem = preferences.CookieBrowser;
+        var cookies = new DarkCombo("Ninguno", "Chrome", "Edge", "Firefox") { AccessibleName = "Sesión del navegador" }; cookies.SelectedItem = preferences.CookieBrowser;
         cookies.SetBounds(30, 654, 220, 34); cookies.SelectedIndexChanged += (_, _) => { preferences.CookieBrowser = cookies.Value; SavePreferences(); }; panel.Controls.Add(cookies);
         var note = Label("Utiliza tu sesión únicamente si un video requiere acceso a tu cuenta.\nPuedes dejarlo en Ninguno para videos públicos.", 9, false, Theme.Muted); note.SetBounds(30, 705, 730, 51); panel.Controls.Add(note);
         var data = new SmoothButton { Text = "Abrir datos y registros", GlyphName = "folder", Width = 224, Quiet = true }; data.SetBounds(28, 779, 224, 44); data.Click += (_, _) => Safe(() => DesktopIntegration.OpenFolder(AppPaths.Data)); panel.Controls.Add(data);
@@ -411,6 +425,7 @@ public sealed class MainForm : Form
     public void Restore() { ShowInTaskbar = true; Show(); WindowState = FormWindowState.Normal; Activate(); }
     public void Quit() { quitting = true; Close(); }
     private void Safe(Action action) { try { action(); } catch (Exception ex) { ShowDetails("SenjiDownloader", ex.Message); } }
+    public void ShowUnexpectedError(Exception error) => ShowDetails("No se pudo completar la acción", error.Message + "\r\n\r\nEl detalle se guardó en Preferencias → Abrir datos y registros.");
     private void ShowDetails(string title, string text)
     {
         using var dialog = new Form { Text = title, BackColor = Theme.Canvas, ForeColor = Theme.Text, Font = Theme.Font(), Size = new Size(700, 400), MinimumSize = new Size(480, 300), StartPosition = FormStartPosition.CenterParent, MinimizeBox = false, MaximizeBox = false, Icon = appIcon };

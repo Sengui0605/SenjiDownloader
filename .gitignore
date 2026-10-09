@@ -8,6 +8,7 @@ outputs/
 *.exe
 *.previous
 *.download
+SenjiDownloader/assets/tools.zip
 *.partial.*
 # Original Python implementation, retained locally as a backup
 legacy/

@@ -12,7 +12,8 @@ internal static class Program
         Startup.Restart();
         NoIntegration = args.Contains("--no-integration");
         if (args.FirstOrDefault() == "--update-helper") return UpdateService.RunHelper(args);
-        var preview = args.FirstOrDefault() is "--render-preview" or "--preview-ui" or "--startup-probe";
+        var uiTest = args.FirstOrDefault() == "--ui-self-test";
+        var preview = uiTest || args.FirstOrDefault() is "--render-preview" or "--preview-ui" or "--startup-probe";
         var selfTest = args.FirstOrDefault() == "--self-test";
         AppPaths.Initialize(preview || selfTest ? Path.Combine(Path.GetDirectoryName(Path.GetFullPath(args[1]))!, "test-data") : null);
         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
@@ -21,12 +22,14 @@ internal static class Program
         {
             AppPaths.Log(e.Exception.ToString());
             if (preview || selfTest) Application.Exit();
-            else MessageBox.Show("Ocurrió un error. Consulta el registro en Preferencias.", "SenjiDownloader");
+            else if (Application.OpenForms.OfType<MainForm>().FirstOrDefault() is { } owner) owner.ShowUnexpectedError(e.Exception);
+            else MessageBox.Show("No se pudo completar la acción:\n" + e.Exception.Message + "\n\nEl detalle se guardó en el registro.", "SenjiDownloader", MessageBoxButtons.OK, MessageBoxIcon.Error);
         };
         AppDomain.CurrentDomain.UnhandledException += (_, e) => AppPaths.Log(e.ExceptionObject.ToString() ?? "Error inesperado.");
         try
         {
-            if (selfTest) return SelfTests.Run(args[1]).GetAwaiter().GetResult();
+            if (selfTest) { ToolBootstrap.EnsureAsync().GetAwaiter().GetResult(); return SelfTests.Run(args[1]).GetAwaiter().GetResult(); }
+            if (uiTest) return UiTests.Run(args[1]);
             if (args.Contains("--quit")) return SingleInstance.Send("EXIT") ? 0 : 1;
             using var instance = preview ? null : new SingleInstance();
             if (instance?.Owns == false) { if (!args.Contains("--background")) SingleInstance.Send("SHOW"); return 0; }

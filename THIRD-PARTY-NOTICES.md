@@ -12,7 +12,8 @@ su propio runtime y sus scripts de extracción.
 | FFmpeg essentials de Gyan | GPL v3, compilación estática con bibliotecas incluidas | https://www.gyan.dev/ffmpeg/builds/ y https://ffmpeg.org/download.html |
 | Deno | MIT, con dependencias de terceros | https://github.com/denoland/deno |
 
-La distribución incluye los textos de licencia en `licenses`. Las versiones y la
+El ejecutable lleva los textos de licencia en su paquete integrado y los extrae
+a `tools/licenses`; el ZIP también los incluye en `licenses`. Las versiones y la
 configuración de FFmpeg aparecen en `tools/versions.json` y en `ffmpeg -version`.
 Los motores mantienen sus licencias originales. El icono y la interfaz se crean
 específicamente para SenjiDownloader. No se distribuyen el código Python original,

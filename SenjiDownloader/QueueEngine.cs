@@ -150,6 +150,7 @@ public sealed class QueueEngine : IDisposable
     {
         try
         {
+            await ToolBootstrap.EnsureAsync().WaitAsync(cancellation.Token);
             if (job.Kind == JobKind.Download) await Download(job, cancellation.Token);
             else await Convert(job, cancellation.Token);
             Update(job.Id, j => j with { State = JobState.Completed, Progress = 100, Detail = "Completado" });

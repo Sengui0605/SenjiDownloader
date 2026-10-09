@@ -171,6 +171,7 @@ public sealed class DarkCombo : Control
 {
     private readonly string[] items;
     private int index;
+    private ContextMenuStrip? menu;
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)] public int SelectedIndex
     {
         get => index;
@@ -212,15 +213,25 @@ public sealed class DarkCombo : Control
     }
     private void Expand()
     {
-        if (!Enabled) return;
-        var menu = new ContextMenuStrip { BackColor = Theme.Surface, ForeColor = Theme.Text, ShowImageMargin = false, ShowCheckMargin = false, Font = Font, Renderer = new DarkMenuRenderer(), MinimumSize = new Size(Width, 0) };
+        if (!Enabled || IsDisposed) return;
+        var popup = OptionsMenu;
+        popup.MinimumSize = new Size(Width, 0);
+        foreach (ToolStripItem item in popup.Items) item.Width = Math.Max(Width - 3, 165);
+        if (!popup.Visible) popup.Show(this, new Point(0, Height + 4));
+    }
+    internal ContextMenuStrip OptionsMenu => menu ??= CreateMenu();
+    private ContextMenuStrip CreateMenu()
+    {
+        var popup = new ContextMenuStrip { BackColor = Theme.Surface, ForeColor = Theme.Text, ShowImageMargin = false, ShowCheckMargin = false, Font = Font, Renderer = new DarkMenuRenderer() };
         for (var i = 0; i < items.Length; i++)
         {
             var selected = i; var item = new ToolStripMenuItem(items[i]) { Height = 34, AutoSize = false, Width = Math.Max(Width - 3, 165), Padding = new Padding(10, 4, 10, 4) };
-            item.Click += (_, _) => SelectedIndex = selected; menu.Items.Add(item);
+            item.Click += (_, _) => SelectedIndex = selected; popup.Items.Add(item);
         }
-        menu.Closed += (_, _) => menu.Dispose(); menu.Show(this, new Point(0, Height + 4));
+        // WinForms still uses the popup after Closed returns. Its owner disposes it.
+        return popup;
     }
+    protected override void Dispose(bool disposing) { if (disposing) menu?.Dispose(); base.Dispose(disposing); }
     protected override AccessibleObject CreateAccessibilityInstance() => new SelectionAccessibleObject(this);
     private sealed class SelectionAccessibleObject(DarkCombo owner) : ControlAccessibleObject(owner)
     {

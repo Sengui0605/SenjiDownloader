@@ -9,7 +9,7 @@ public static class ProcessRunner
     internal static bool TraceProcesses;
     public static async Task<string> Run(string executable, IEnumerable<string> arguments, Action<string>? onLine, CancellationToken token)
     {
-        if (!File.Exists(executable)) throw new FileNotFoundException("Falta un componente de la carpeta tools. Extrae la distribución completa.", executable);
+        if (!File.Exists(executable)) throw new FileNotFoundException("No se pudo preparar un componente incluido. Comprueba que puedes escribir en la carpeta de la app y vuelve a abrirla.", executable);
         var start = new ProcessStartInfo(executable)
         {
             UseShellExecute = false, CreateNoWindow = true,

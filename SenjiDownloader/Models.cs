@@ -45,7 +45,7 @@ public static class AppPaths
 {
     public static string Base { get; } = AppContext.BaseDirectory;
     public static string Data { get; private set; } = "";
-    public static string Tools => Path.Combine(Base, "tools");
+    public static string Tools { get; private set; } = Path.Combine(Base, "tools");
     public static string DefaultDownloads => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "SenjiDownloader");
     public static void Initialize(string? overridePath = null)
     {
@@ -60,6 +60,7 @@ public static class AppPaths
         {
             Data = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SenjiDownloader");
             Directory.CreateDirectory(Data);
+            Tools = Path.Combine(Data, "tools");
         }
     }
     public static string Tool(string name) => Path.Combine(Tools, name + ".exe");
