@@ -1,0 +1,22 @@
+# Native build products and private runtime state
+**/bin/
+**/obj/
+dist/
+data/
+work/
+outputs/
+*.exe
+*.previous
+*.download
+*.partial.*
+# Original Python implementation, retained locally as a backup
+legacy/
+venv/
+src/
+main.py
+build_exe.py
+requirements.txt
+MediaToolkit.spec
+__pycache__/
+.vs/
+.DS_Store
